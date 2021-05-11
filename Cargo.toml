@@ -1,0 +1,17 @@
+[package]
+name = "eruptor"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+path = "src/client/client.rs"
+name = "client"
+
+[[bin]]
+path = "src/server/server.rs"
+name = "server"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+warp = "0.3"
+metrohash = "1"
