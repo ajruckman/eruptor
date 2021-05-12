@@ -1,4 +1,6 @@
-use crate::types::{Elem, Region, Renderable, Token};
+use std::time::Instant;
+
+use crate::types::{Elem, Region, Renderable, Token, Content};
 
 mod types;
 
@@ -9,17 +11,15 @@ fn main() {
 
     let mut p = Elem::new("p");
     p.push_attr(types::Attr::String("asdf", "asdf"));
+    p.push_child(types::Node::Content(Content::Plain("Paragraph content".to_owned())));
     e.push_child(p.into());
 
     let mut region = Region::new(vec![e.into()]);
 
     println!("{}", region.hash());
-    for token in region.render() {
-        match token {
-            Token::HTML(v) => println!("{}", v),
-            Token::String(v) => println!("{}", v),
-        }
-    }
+
+    region.print();
+
     println!("{}", region.hash());
 
     region.push_child(Elem::new("p").into());

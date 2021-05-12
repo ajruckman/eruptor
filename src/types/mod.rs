@@ -1,7 +1,5 @@
-use std::collections::HashMap;
-use std::io::{BufWriter, Write};
-use std::error::Error;
-use std::hash::{Hasher, Hash};
+use std::hash::{Hash, Hasher};
+
 use metrohash::MetroHash;
 
 include!("elements.rs");
