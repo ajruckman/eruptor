@@ -1,181 +1,3 @@
-pub enum Token {
-    ElemOpener(String),
-    ElemCloser(String),
-    ElemAttr(String, Option<String>),
-    Content(Content),
-}
-
-pub trait Renderable {
-    fn render(&self) -> Vec<Token>;
-}
-
-impl<'a> Renderable for Region<'a> {
-    fn render(&self) -> Vec<Token> {
-        let mut result: Vec<Token> = Vec::new();
-
-        for child in &self.children {
-            for token in child.render() {
-                result.push(token);
-            }
-        }
-
-        return result;
-    }
-}
-
-pub struct Region<'a> {
-    children: Vec<Node<'a>>,
-}
-
-impl<'a> Region<'a> {
-    pub fn new(children: Vec<Node<'a>>) -> Region<'a> {
-        Region {
-            children,
-        }
-    }
-
-    pub fn push_child(&mut self, et: Node<'a>) {
-        self.children.push(et);
-    }
-
-    pub fn hash(&mut self) -> u64 {
-        let mut h = metrohash::MetroHash::default();
-        for child in &self.children {
-            child.hash(&mut h);
-        }
-        h.finish()
-    }
-
-    pub fn print(&self) {
-        let mut in_opener = false;
-
-        for token in self.render() {
-            match token {
-                Token::ElemAttr(_, _) => {}
-                _ => {
-                    if in_opener {
-                        in_opener = false;
-                        print!(">");
-                    }
-                }
-            }
-
-            match token {
-                Token::ElemOpener(e) => {
-                    print!("<{}", e);
-                    in_opener = true;
-                }
-                Token::ElemCloser(e) => {
-                    print!("</{}>", e);
-                }
-                Token::ElemAttr(k, vo) => {
-                    if !in_opener { panic!("attribute token outside of element") }
-
-                    match vo {
-                        None => {}
-                        Some(v) => print!(" {}='{}'", k, v)
-                    }
-                }
-                Token::Content(v) => {
-                    match v {
-                        Content::Plain(s) => print!("{}", s),
-                        Content::Markup(s) => print!("{}", s),
-                    }
-                }
-            }
-        }
-
-        println!();
-    }
-
-    // pub fn iter(&self) -> impl Iterator<Item = &Token> {
-    //     let mut result: Vec<Token> = Vec::new();
-    //     for child in &self.children {
-    //         for token in child.render() {
-    //             result.push(token);
-    //         }
-    //     }
-    //     return result.iter();
-    // }
-}
-
-// impl<'a> Iterator for Region<'a> {
-//     type Item = ();
-//
-//     fn next(&mut self) -> Option<Self::Item> {
-//
-//     }
-// }
-
-pub enum Content {
-    Plain(String),
-    Markup(String),
-}
-
-impl Clone for Content {
-    fn clone(&self) -> Self {
-        match self {
-            Content::Plain(v) => Content::Plain(v.clone()),
-            Content::Markup(v) => Content::Markup(v.clone()),
-        }
-    }
-}
-
-pub enum Node<'a> {
-    Elem(Elem<'a>),
-    Content(Content),
-}
-
-impl<'a> Node<'a> {
-    fn hash(&self, h: &mut MetroHash) {
-        match self {
-            Node::Elem(e) => e.hash(h),
-            Node::Content(c) => {
-                match c {
-                    Content::Plain(v) => (*v).hash(h),
-                    Content::Markup(v) => (*v).hash(h),
-                }
-            }
-        }
-    }
-}
-
-impl<'a> Renderable for Node<'a> {
-    fn render(&self) -> Vec<Token> {
-        match self {
-            Node::Elem(e) => {
-                let mut result: Vec<Token> = Vec::new();
-
-                result.push(Token::ElemOpener(e.name.to_owned()));
-
-                for attr in &e.attrs {
-                    match attr {
-                        Attr::String(k, v) => result.push(Token::ElemAttr(k.to_string(), Some(v.to_string()))),
-                        Attr::Bool(k, v) => {
-                            if !v {
-                                result.push(Token::ElemAttr(k.to_string(), None));
-                            } else {
-                                result.push(Token::ElemAttr(k.to_string(), Some(k.to_string())));
-                            }
-                        }
-                    }
-                }
-
-                for child in &e.children {
-                    for token in child.render() {
-                        result.push(token);
-                    }
-                }
-
-                result.push(Token::ElemCloser(e.name.to_owned()));
-
-                result
-            }
-            Node::Content(v) => vec![Token::Content(v.clone())],
-        }
-    }
-}
-
 pub struct Elem<'a> {
     name: &'a str,
     attrs: Vec<Attr<'a>>,
@@ -203,15 +25,15 @@ impl<'a> Elem<'a> {
         self.children.push(et);
     }
 
-    fn attrs_string(&self) -> String {
-        let mut result: Vec<String> = Vec::new();
-
-        for attr in &self.attrs {
-            result.push(attr.serialize());
-        }
-
-        return result.join(" ");
-    }
+    // fn attrs_string(&self) -> String {
+    //     let mut result: Vec<String> = Vec::new();
+    //
+    //     for attr in &self.attrs {
+    //         result.push(attr.serialize());
+    //     }
+    //
+    //     return result.join(" ");
+    // }
 
     fn hash(&self, h: &mut MetroHash) {
         self.name.hash(h);
@@ -267,6 +89,20 @@ impl<'a> Attr<'a> {
                 (**k).hash(h);
                 (*v).hash(h);
             }
+        }
+    }
+}
+
+pub enum Content {
+    Plain(String),
+    Markup(String),
+}
+
+impl Clone for Content {
+    fn clone(&self) -> Self {
+        match self {
+            Content::Plain(v) => Content::Plain(v.clone()),
+            Content::Markup(v) => Content::Markup(v.clone()),
         }
     }
 }
