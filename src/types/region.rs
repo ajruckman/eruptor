@@ -1,15 +1,15 @@
-pub struct Region<'a> {
-    children: Vec<Node<'a>>,
+pub struct Region {
+    children: Vec<NodeValue>,
 }
 
-impl<'a> Region<'a> {
-    pub fn new(children: Vec<Node<'a>>) -> Region<'a> {
+impl Region {
+    pub fn new(children: Vec<NodeValue>) -> Region {
         Region {
             children,
         }
     }
 
-    pub fn push_child(&mut self, et: Node<'a>) {
+    pub fn push_child(&mut self, et: NodeValue) {
         self.children.push(et);
     }
 
@@ -73,7 +73,7 @@ impl<'a> Region<'a> {
     }
 }
 
-impl<'a> Tokenizable for Region<'a> {
+impl<'a> Tokenizable for Region {
     fn tokenize(&self) -> Vec<Token> {
         let mut result: Vec<Token> = Vec::new();
 

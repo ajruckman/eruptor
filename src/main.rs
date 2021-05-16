@@ -1,4 +1,6 @@
-use crate::types::{Elem, Region, Content, DOMBuilder};
+#![feature(raw_ref_op)]
+
+use crate::types::{Elem, Region, Content, DOMBuilder, TDOMBuilder};
 
 mod types;
 
@@ -7,24 +9,28 @@ fn main() {
 
     //
 
-    let mut builder = DOMBuilder::default();
+    let mut builder = DOMBuilder::new();
 
     builder.open_element(types::elem_types::body);
-    builder.add_attribute_str("qwer", "asdf");
-    builder.add_attribute_bool("2", true);
-    builder.add_attribute_bool("3", false);
-
-    builder.add_content(Content::Plain("hello world".to_owned()));
-
-    // builder.open_element(types::elem_types::div);
-    // builder.add_content(Content::Plain("asdf".to_owned()));
-    // builder.close_element();
-
     builder.close_element();
 
-    let r = builder.build();
+    builder.build();
 
-    r.print();
+    // builder.add_attribute_str("qwer", "asdf");
+    // builder.add_attribute_bool("2", true);
+    // builder.add_attribute_bool("3", false);
+    //
+    // builder.add_content(Content::Plain("hello world".to_owned()));
+    //
+    // // builder.open_element(types::elem_types::div);
+    // // builder.add_content(Content::Plain("asdf".to_owned()));
+    // // builder.close_element();
+    //
+    // builder.close_element();
+    //
+    // let r = builder.build();
+    //
+    // r.print();
 
     return;
 
@@ -35,8 +41,8 @@ fn main() {
     let mut e = Elem::new(types::elem_types::body);
 
     let mut p = Elem::new("p");
-    p.push_attr(types::Attr::String("asdf", "asdf"));
-    p.push_child(types::Node::Content(Content::Plain("Paragraph content".to_owned())));
+    // p.push_attr(types::Attr::String("asdf", "asdf"));
+    p.push_child(types::NodeValue::Content(Content::Plain("Paragraph content".to_owned())));
     e.push_child(p.into());
 
     let mut region = Region::new(vec![e.into()]);

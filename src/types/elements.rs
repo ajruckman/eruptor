@@ -1,13 +1,13 @@
-pub struct Elem<'a> {
-    name: &'a str,
-    attrs: Vec<Attr<'a>>,
-    children: Vec<Node<'a>>,
+pub struct Elem {
+    name: String,
+    attrs: Vec<Attr>,
+    children: Vec<NodeValue>,
 }
 
-impl<'a> Elem<'a> {
-    pub fn new(t: &'a str) -> Elem<'a> {
+impl Elem {
+    pub fn new(t: &str) -> Elem {
         Elem {
-            name: t,
+            name: t.to_owned(),
             attrs: Vec::new(),
             children: Vec::new(),
         }
@@ -17,11 +17,11 @@ impl<'a> Elem<'a> {
         &self.attrs
     }
 
-    pub fn push_attr(&mut self, val: Attr<'a>) {
+    pub fn push_attr(&mut self, val: Attr) {
         self.attrs.push(val);
     }
 
-    pub fn push_child(&mut self, et: Node<'a>) {
+    pub fn push_child(&mut self, et: NodeValue) {
         self.children.push(et);
     }
 
@@ -47,18 +47,18 @@ impl<'a> Elem<'a> {
     }
 }
 
-impl<'a> Into<Node<'a>> for Elem<'a> {
-    fn into(self) -> Node<'a> {
-        Node::Elem(self)
+impl Into<NodeValue> for Elem {
+    fn into(self) -> NodeValue {
+        NodeValue::Elem(self)
     }
 }
 
-pub enum Attr<'a> {
-    String(&'a str, &'a str),
-    Bool(&'a str, bool),
+pub enum Attr {
+    String(String, String),
+    Bool(String, bool),
 }
 
-impl<'a> Attr<'a> {
+impl Attr {
     pub fn name(&self) -> &str {
         match self {
             Attr::String(k, _) => k,
