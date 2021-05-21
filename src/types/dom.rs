@@ -22,7 +22,6 @@ impl NodeTree {
         let arc = Arc::new(Mutex::new(tree));
 
         let root = Arc::new(Mutex::new(Node {
-            tree: arc.clone(),
             value: NodeValue::Root,
             index: 0,
             parent: None,
@@ -62,7 +61,7 @@ impl NodeTree {
 }
 
 pub struct Node {
-    tree: Arc<Mutex<NodeTree>>,
+    // tree: Arc<Mutex<NodeTree>>,
     value: NodeValue,
     index: usize,
     parent: Option<usize>,
